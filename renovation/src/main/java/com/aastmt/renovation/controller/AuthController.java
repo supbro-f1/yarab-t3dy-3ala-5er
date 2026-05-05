@@ -1,9 +1,18 @@
+package com.aastmt.renovation.controller; // Make sure your package is here!
+
+import com.aastmt.renovation.dto.UserLoginDto;
+import com.aastmt.renovation.dto.UserRegisterDto;
 import com.aastmt.renovation.model.Role;
+import com.aastmt.renovation.service.AuthService;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 public class AuthController {
@@ -15,66 +24,78 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String RegisterPage() {
-        return "register";
+    public String RegisterPage(Model model) {
+      
+        model.addAttribute("userDto", new UserRegisterDto());
+        return "register"; 
     }
 
     @PostMapping("/register")
     public String RegisterForm(
-        @RequestParam("fname") String fname,
-        @RequestParam("lname") String lname,
-        @RequestParam("username") String username,
-        @RequestParam("profession") String profession,
-        @RequestParam("role") Role role,
-        @RequestParam("password") String password,
-        @RequestParam("phonenumber") String phonenumber,
-        HttpSession session
+        @Valid @ModelAttribute("userDto") UserRegisterDto userDto, 
+        BindingResult bindingResult, 
+        HttpSession session,
+        Model model // 
     ) {
         
-        boolean isValid = authService.register(fname, lname, username, profession, role, password, phonenumber);
+        if (bindingResult.hasErrors()) {
+            return "register";
+        }
+        
+        
+        boolean isValid = authService.register(userDto);
         
         if (isValid) {
-            session.setAttribute("loggedInUser", username);
-            session.setAttribute("userRole", role.name());
+            session.setAttribute("loggedInUser", userDto.getUsername());
+            session.setAttribute("userRole", userDto.getRole().name());
             
-            if (role == Role.worker) {
+            if (userDto.getRole() == Role.worker) {
                 return "redirect:/worker-dashboard";
-            } else if (role == Role.user) {
+            } else if (userDto.getRole() == Role.user) {
                 return "redirect:/user-dashboard";
             }
         }
         
+        
+        model.addAttribute("registerError", "Username, Email, or Phone number is already in use.");
         return "register"; 
     }
-    
+
     @GetMapping("/login")
-    public String LoginPage() {
+    public String LoginPage(Model model) {
+        model.addAttribute("loginDto", new UserLoginDto());
         return "login"; 
     }
 
     @PostMapping("/login")
     public String LoginForm(
-        @RequestParam("username") String username,
-        @RequestParam("password") String password,
-        @RequestParam("role") Role role,
-        HttpSession session
+        @Valid @ModelAttribute("loginDto") UserLoginDto loginDto,
+        BindingResult bindingResult,
+        HttpSession session,
+        Model model
     ) {
-        boolean isValid = authService.login(username, password, role);
+  
+        if (bindingResult.hasErrors()) {
+            return "login"; 
+        }
+
+        
+        boolean isValid = authService.login(loginDto);
         
         if (isValid) {
-            session.setAttribute("loggedInUser", username);
-            session.setAttribute("userRole", role.name());
+            session.setAttribute("loggedInUser", loginDto.getUsername());
+            session.setAttribute("userRole", loginDto.getRole().name());
             
-            if (role == Role.worker) {
-                return "redirect:/worker-dashboard";
-            } else if (username.equals("Maher") && password.equals("admin")) {
+            if (loginDto.getUsername().equals("Maher") && loginDto.getPassword().equals("admin")) {
                 return "redirect:/admin-dashboard";
-            } else if (role == Role.user) {
+            } else if (loginDto.getRole() == Role.worker) {
+                return "redirect:/worker-dashboard";
+            } else if (loginDto.getRole() == Role.user) {
                 return "redirect:/user-dashboard";
             }
         }
         
-      
+        model.addAttribute("loginError", "Invalid username, password, or role combination.");
         return "login"; 
     }
 }
