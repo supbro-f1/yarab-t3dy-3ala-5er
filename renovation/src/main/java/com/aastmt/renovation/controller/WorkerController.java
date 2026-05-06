@@ -66,3 +66,13 @@ public class WorkerController {
         }
     }
 
+    @PatchMapping("/{id}/availability")
+    public ResponseEntity<Worker> updateAvailability(@PathVariable Long id, @RequestParam boolean available) {
+        try {
+            Worker worker = workerService.updateAvailability(id, available);
+            return ResponseEntity.ok(worker);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
