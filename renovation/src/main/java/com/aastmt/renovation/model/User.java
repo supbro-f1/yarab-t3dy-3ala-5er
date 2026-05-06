@@ -129,5 +129,4 @@ public class User {
     public void setProfision(String profision) {
         this.profision = profision;
     }
-
 }
