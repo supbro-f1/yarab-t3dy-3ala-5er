@@ -8,3 +8,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+@RestController
+@RequestMapping("/api/workers")
+public class WorkerController {
+
+    private final WorkerService workerService;
+
+    public WorkerController(WorkerService workerService) {
+        this.workerService = workerService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Worker>> getAllWorkers() {
+        return ResponseEntity.ok(workerService.getAllWorkers());
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<Worker>> getAvailableWorkers() {
+        return ResponseEntity.ok(workerService.getAvailableWorkers());
+    }
+
+    @GetMapping("/available/{profession}")
+    public ResponseEntity<List<Worker>> getAvailableWorkersByProfession(@PathVariable String profession) {
+        return ResponseEntity.ok(workerService.getAvailableWorkersByProfession(profession));
+    }
+
