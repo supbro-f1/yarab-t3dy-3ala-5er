@@ -34,3 +34,18 @@ public class WorkerController {
         return ResponseEntity.ok(workerService.getAvailableWorkersByProfession(profession));
     }
 
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<Worker>> getTopRatedWorkers() {
+        return ResponseEntity.ok(workerService.getWorkersSortedByRating());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Worker> getWorkerProfile(@PathVariable Long id) {
+        try {
+            Worker worker = workerService.getWorkerProfile(id);
+            return ResponseEntity.ok(worker);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
