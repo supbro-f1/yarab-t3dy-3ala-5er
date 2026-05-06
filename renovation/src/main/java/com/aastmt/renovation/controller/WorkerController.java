@@ -88,3 +88,9 @@ public class WorkerController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteWorker(@PathVariable Long id) {
+        workerService.deleteWorker(id);
+        return ResponseEntity.noContent().build();
+    }
+}
