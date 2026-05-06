@@ -76,3 +76,15 @@ public class WorkerController {
         }
     }
 
+    @PatchMapping("/{id}/rating")
+    public ResponseEntity<Worker> updateRating(@PathVariable Long id, @RequestParam Double newRating) {
+        try {
+            Worker worker = workerService.updateRating(id, newRating);
+            return ResponseEntity.ok(worker);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
