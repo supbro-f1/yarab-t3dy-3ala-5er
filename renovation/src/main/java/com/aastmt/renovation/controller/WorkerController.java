@@ -49,3 +49,20 @@ public class WorkerController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity<Worker> createWorker(@RequestBody Worker worker) {
+        Worker savedWorker = workerService.saveWorker(worker);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedWorker);
+    }
+
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<Worker> updateProfile(@PathVariable Long id, @RequestBody Worker updatedWorker) {
+        try {
+            updatedWorker.setId(id);
+            Worker saved = workerService.updateWorkerProfile(updatedWorker);
+            return ResponseEntity.ok(saved);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
