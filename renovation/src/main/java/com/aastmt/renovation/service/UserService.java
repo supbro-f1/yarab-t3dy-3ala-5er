@@ -16,7 +16,11 @@ public class UserService {
     public User getUserProfile(Long id) {
         return userrepo.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
-    
+
+    // get user by username
+    public User getUserByUsername(String username) {
+        return userrepo.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found " + username));
+    }
     // update user prof
     public boolean updateUserProfile(Long id, UserRegisterDto dtoObj) {
         
@@ -58,4 +62,4 @@ public class UserService {
         userrepo.deleteById(id);
         return true;
     }
-  
+    
