@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — RenovateMe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #F6F7FB;
+      --surface:    #FFFFFF;
+      --text:       #0F172A;
+      --muted:      #6B7280;
+      --border:     #E5E7EB;
+      --border-2:   #EEF2F7;
+      --primary:    #0B1220;
+      --primary-2:  #121C2E;
+      --primary-tx: #FFFFFF;
+      --success-bg: #ECFDF5;
+      --success-tx: #047857;
+      --warn-bg:    #FFFBEB;
+      --warn-tx:    #B45309;
+      --danger-bg:  #FEF2F2;
+      --danger-tx:  #B91C1C;
+      --radius:     14px;
+      --shadow:     0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-sm:  0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; }
+    nav {
+      background: transparent;
+      padding: 1.5rem 1.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .nav-brand {
+      font-size: .95rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .nav-right { display: flex; align-items: center; gap: 1.25rem; }
+    .nav-user {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .875rem; color: var(--muted);
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 600;
+    }
+    .btn-logout {
+      font-size: .8rem; color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: .45rem .9rem;
+      border-radius: 10px;
+      cursor: pointer; transition: all .15s;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-logout:hover { border-color: var(--danger-tx); color: var(--danger-tx); }
+    .page { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1.5rem 2.5rem; width: 100%; }
+
+    .welcome {
+      max-width: 520px;
+      margin: 1rem auto 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.4rem 1.4rem 1.1rem;
+      text-align: center;
+    }
+    .welcome h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .welcome p { color: var(--muted); margin-top: .35rem; font-size: .8rem; }
+    .alert-error {
+      max-width: 520px;
+      margin: 0 auto 1.25rem;
+      background: var(--danger-bg); border: 1px solid #FECACA;
+      color: var(--danger-tx); border-radius: 12px;
+      padding: .85rem 1rem;
+      font-size: .875rem;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+    }
+    .card-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .profile-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .profile-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 600; flex-shrink: 0;
+    }
+    .profile-name { font-weight: 600; font-size: .95rem; }
+    .profile-role {
+      font-size: .75rem;
+      color: var(--muted);
+      background: var(--bg);
+      border-radius: 999px;
+      padding: .15rem .6rem;
+      display: inline-block;
+      margin-top: .25rem;
+    }
+
+    .info-grid { display: grid; gap: .75rem; }
+    .info-item label {
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--muted);
+      display: block;
+      margin-bottom: .2rem;
+    }
+    .info-item span { font-size: .9rem; font-weight: 500; }
+    .btn-edit {
+      margin-top: 1.25rem; width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .65rem .75rem;
+      cursor: pointer;
+      font-size: .85rem;
+      color: var(--text);
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .btn-edit:hover { border-color: var(--primary); }
+    #update-form { display: none; margin-top: 1.1rem; }
+    #update-form.open { display: block; }
+
+    .field { margin-bottom: .85rem; }
+    .field label {
+      font-size: .75rem; font-weight: 500; display: block;
+      margin-bottom: .3rem; color: var(--muted);
+    }
+    .field input {
+      width: 100%; padding: .6rem .75rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      font-size: .875rem; font-family: inherit;
+      background: #fff; color: var(--text);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field input::placeholder { color: #9CA3AF; }
+    .field input:focus { outline: none; border-color: #CBD5E1; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08); }
+
+    .btn-primary {
+      width: 100%; padding: .7rem;
+      background: linear-gradient(180deg, var(--primary-2), var(--primary)); color: var(--primary-tx);
+      border: none; border-radius: 9px;
+      font-size: .875rem; font-weight: 600;
+      cursor: pointer; transition: transform .12s ease, filter .15s ease;
+      font-family: inherit;
+    }
+    .btn-primary:hover { filter: brightness(1.02); }
+    .btn-primary:active { transform: translateY(1px); }
+
+    .select-styled {
+      width: 100%; padding: .6rem .75rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      font-size: .875rem; font-family: inherit;
+      background: #fff; color: var(--text);
+      appearance: none; cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .select-styled:focus { outline: none; border-color: #CBD5E1; box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08); }
+
+    .worker-cards {
+      display: grid; gap: .6rem; margin-bottom: 1rem;
+    }
+    .worker-option {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: .7rem .9rem; cursor: pointer;
+      display: flex; align-items: center; gap: .75rem;
+      transition: all .15s;
+    }
+    .worker-option:has(input:checked) {
+      border-color: #CBD5E1; background: var(--bg);
+    }
+    .worker-option input { accent-color: var(--primary); }
+    .worker-name { font-weight: 500; font-size: .875rem; }
+    .worker-prof { font-size: .75rem; color: var(--muted); }
+    .worker-rating {
+      margin-left: auto; font-size: .75rem;
+      color: var(--warn-tx); font-weight: 600;
+    }
+    .full-width { grid-column: 1 / -1; }
+    .jobs-table { width: 100%; border-collapse: collapse; }
+    .jobs-table th {
+      text-align: left; font-size: .7rem;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); padding: .5rem .75rem;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .jobs-table td {
+      padding: .85rem .75rem; font-size: .875rem;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .jobs-table tr:last-child td { border-bottom: none; }
+    .jobs-table tr:hover td { background: #F9FAFB; }
+
+    .badge {
+      font-size: .7rem; font-weight: 600;
+      padding: .2rem .6rem; border-radius: 20px;
+      letter-spacing: .04em;
+    }
+    .badge-pending  { background: var(--warn-bg); color: var(--warn-tx); }
+    .badge-accepted { background: var(--success-bg); color: var(--success-tx); }
+    .badge-denied   { background: var(--danger-bg); color: var(--danger-tx); }
+    .badge-done     { background: #E0E7FF; color: #3730A3; }
+
+    .empty-state {
+      text-align: center; color: var(--muted);
+      padding: 2rem; font-size: .875rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">RenovateMe</span>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(firstName,0,1))}">Y</div>
+      <span th:text="${firstName + ' ' + lastName}">Yahya User</span>
+    </div>
+    <a class="btn-logout" th:href="@{/user/logout}">Log out</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="welcome">
+    <h1>Welcome back, <span th:text="${firstName}">Yahya</span>.</h1>
+    <p>Manage your renovation requests and profile from here.</p>
+  </div>
+
+  <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+  <div class="grid">
+
+    <div class="card">
+      <p class="card-title">My profile</p>
+
+      <div class="profile-row">
+        <div class="profile-avatar" th:text="${#strings.toUpperCase(#strings.substring(firstName,0,1))}">Y</div>
+        <div>
+          <div class="profile-name" th:text="${firstName + ' ' + lastName}">Yahya User</div>
+          <span class="profile-role">Client</span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Username</label>
+          <span th:text="${username}">yahya123</span>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <span th:text="${email}">yahya@email.com</span>
+        </div>
+        <div class="info-item">
+          <label>Phone</label>
+          <span th:text="${phoneNumber}">+20 100 000 0000</span>
+        </div>
+      </div>
+
+      <button class="btn-edit" onclick="document.getElementById('update-form').classList.toggle('open'); this.textContent = this.textContent.includes('Edit') ? '✕ Cancel' : '✎ Edit profile'">
+        ✎ Edit profile
+      </button>
+      <form id="update-form" th:action="@{/user/update}" method="post">
+        <div class="field">
+          <label>First name</label>
+          <input type="text" name="fname" th:value="${firstName}" required/>
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" name="lname" th:value="${lastName}" required/>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" th:value="${username}" required/>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" th:value="${email}" required/>
+        </div>
+        <div class="field">
+          <label>Phone number</label>
+          <input type="tel" name="phonenumber" th:value="${phoneNumber}" required/>
+        </div>
+        <div class="field">
+          <label>New password</label>
+          <input type="password" name="password" placeholder="Leave blank to keep current"/>
+        </div>
+        <button type="submit" class="btn-primary">Save changes</button>
+      </form>
+    </div>
+    <div class="card">
+      <p class="card-title">New renovation request</p>
+
+      <form th:action="@{/user/request}" method="post" th:object="${newJob}">
+
+        <div class="field">
+          <label>House size</label>
+          <select class="select-styled" name="houseSize" required>
+            <option value="" disabled selected>Select size…</option>
+            <option value="SMALL">Small — up to 80 m²</option>
+            <option value="MEDIUM">Medium — 80–150 m²</option>
+            <option value="LARGE">Large — 150–300 m²</option>
+            <option value="VILLA">Villa — 300 m²+</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Preferred start date</label>
+          <input type="date" name="startTime" required/>
+        </div>
+
+        <div class="field">
+          <label>Expected end date</label>
+          <input type="date" name="endTime" required/>
+        </div>
+        <div class="field">
+          <label>Choose a worker</label>
+          <div class="worker-cards">
+            <label class="worker-option" th:each="worker : ${workers}">
+              <input type="radio" name="workerId" th:value="${worker.id}" required/>
+              <div>
+                <div class="worker-name" th:text="${worker.name}">Worker Name</div>
+                <div class="worker-prof" th:text="${worker.profession}">Electrician</div>
+              </div>
+              <span class="worker-rating" th:text="'★ ' + ${worker.rating}">★ 4.8</span>
+            </label>
+            <p th:if="${#lists.isEmpty(workers)}" style="font-size:.85rem;color:var(--muted)">
+              No workers available at the moment.
+            </p>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Submit request</button>
+      </form>
+    </div>
+    <div class="card full-width">
+      <p class="card-title">My renovation requests</p>
+      <table class="jobs-table" th:if="${not #lists.isEmpty(myJobs)}">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>House size</th>
+            <th>Worker</th>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="job : ${myJobs}">
+            <td th:text="'#' + ${job.id}">#1</td>
+            <td th:text="${job.houseSize}">Medium</td>
+            <td th:text="${job.workerId}">—</td>
+            <td th:text="${#temporals.format(job.startTime, 'dd MMM yyyy')}">01 Jan 2025</td>
+            <td th:text="${#temporals.format(job.endTime,   'dd MMM yyyy')}">15 Jan 2025</td>
+            <td>
+              <span class="badge"
+                th:classappend="${job.status == 'PENDING'}  ? 'badge-pending'  :
+                                 (${job.status == 'ACCEPTED'} ? 'badge-accepted' :
+                                 (${job.status == 'DENIED'}   ? 'badge-denied'   : 'badge-done'))"
+                th:text="${job.status}">PENDING</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-state" th:if="${#lists.isEmpty(myJobs)}">
+        You haven't submitted any requests yet. Use the form above to get started.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
