@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">\n<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Worker Dashboard</title>
+    <style>\n        * { box-sizing: border-box; margin: 0; padding: 0; }\n        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+        }\n        
+        .navbar {
+            background: #1a1a2e;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .navbar h1 { font-size: 1.4rem; letter-spacing: 1px; }
+        .navbar a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .navbar a:hover { background: #e94560; border-color: #e94560; color: white; }\n        
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }\n        
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .profile-avatar {
+            width: 80px; height: 80px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: white;
+        }
+        .profile-info h2 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+        .profile-info p  { color: #666; margin-bottom: 0.4rem; }\n        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-available   { background: #d4edda; color: #155724; }
+        .badge-unavailable { background: #f8d7da; color: #721c24; }\n        
+        .stars { color: #f4c542; font-size: 1.2rem; }\n        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1a1a2e;
+            border-left: 4px solid #e94560;
+            padding-left: 0.8rem;
+        }\n        
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-top: 4px solid #1a1a2e;
+        }
+        .job-card h3   { margin-bottom: 0.5rem; color: #1a1a2e; }
+        .job-card p    { font-size: 0.9rem; color: #555; margin-bottom: 0.3rem; }
+        .job-card .status-pending  { color: #856404; font-weight: 600; }
+        .job-card .status-accepted { color: #155724; font-weight: 600; }
+        .job-card .status-denied   { color: #721c24; font-weight: 600; }\n        
+        .card-actions { display: flex; gap: 0.7rem; margin-top: 1rem; }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-accept   { background: #28a745; color: white; }
+        .btn-deny     { background: #dc3545; color: white; }
+        .btn-complete { background: #007bff; color: white; }\n        
+        .edit-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #444;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .form-group input:focus { outline: none; border-color: #1a1a2e; }
+        .btn-save { background: #1a1a2e; color: white; padding: 0.7rem 2rem; }\n        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            background: white;
+            border-radius: 10px;
+        }
+        .empty-state p { font-size: 1.1rem; }
+    </style>
+</head>
+<body>\n    
+    <nav class="navbar">
+        <h1>🔨 Worker Dashboard</h1>
+        <a th:href="@{/auth/logout}">Logout</a>
+    </nav>\n    <div class="container">\n        
+        <div class="profile-card">
+            <div class="profile-avatar">👷</div>
+            <div class="profile-info">\n                <h2 th:text="${worker.name}">Worker Name</h2>
+                <p th:text="${worker.profession}">Profession</p>\n                
+                <div class="stars">\n                    <span th:text="${'★'.repeat(worker.rating.intValue()) + '☆'.repeat(5 - worker.rating.intValue())}">★★★★☆</span>
+                    <span style="color:#333; font-size:0.9rem;" th:text="${worker.rating + ' / 5.0'}"></span>
+                </div>\n                
+                <span class="badge"
+                      th:classappend="${worker.available} ? 'badge-available' : 'badge-unavailable'"
+                      th:text="${worker.available} ? 'Available' : 'Currently Busy'">
+                    Status
+                </span>
+            </div>
+        </div>\n        
+        <div class="section-title">📋 Incoming Job Requests</div>\n        
+        <div class="empty-state" th:if="${#lists.isEmpty(jobs)}">
+            <p>No pending job requests right now. Check back soon!</p>
+        </div>\n        
+        <div class="jobs-grid" th:unless="${#lists.isEmpty(jobs)}">\n            <div class="job-card" th:each="job : ${jobs}">
+                <h3>Job #<span th:text="${job.id}"></span></h3>
+                <p>🏠 House Size: <strong th:text="${job.houseSize}"></strong></p>
+                <p>📅 Requested: <span th:text="${job.startTime}"></span></p>\n                
+                <p>Status:
+                    <span th:text="${job.status}"
+                          th:classappend="${job.status == 'PENDING'}   ? 'status-pending'  :
+                                          (job.status == 'ACCEPTED')  ? 'status-accepted' :
+                                          'status-denied'">
+                    </span>
+                </p>\n                
+                <div class="card-actions" th:if="${job.status == 'PENDING'}">\n                    <form th:action="@{/worker/accept/{id}(id=${job.id})}" method="post">
+                        <button type="submit" class="btn btn-accept">✔ Accept</button>
+                    </form>\n                    
+                    <form th:action="@{/worker/deny/{id}(id=${job.id})}" method="post">
+                        <button type="submit" class="btn btn-deny">✘ Deny</button>
+                    </form>
+                </div>\n                
+                <div class="card-actions" th:if="${job.status == 'ACCEPTED'}">
+                    <form th:action="@{/worker/complete/{id}(id=${job.id})}" method="post">
+                        <button type="submit" class="btn btn-complete">✅ Mark Complete</button>
+                    </form>
+                </div>
+            </div>
+        </div>\n        
+        <div class="section-title">✏️ Edit My Profile</div>
+        <div class="edit-form">
+            <form th:action="@{/worker/update}" method="post">
+                <div class="form-group">
+                    <label for="name">Full Name</label>\n                    <input type="text" id="name" name="name"
+                           th:value="${worker.name}" required />
+                </div>
+                <div class="form-group">
+                    <label for="profession">Profession</label>
+                    <select id="profession" name="profession">
+                        <option value="Plumber"      th:selected="${worker.profession == 'Plumber'}">Plumber</option>
+                        <option value="Electrician"  th:selected="${worker.profession == 'Electrician'}">Electrician</option>
+                        <option value="Painter"      th:selected="${worker.profession == 'Painter'}">Painter</option>
+                        <option value="Carpenter"    th:selected="${worker.profession == 'Carpenter'}">Carpenter</option>
+                        <option value="Tiler"        th:selected="${worker.profession == 'Tiler'}">Tiler</option>
+                        <option value="Cleaner"      th:selected="${worker.profession == 'Cleaner'}">Cleaner</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-save">💾 Save Changes</button>
+            </form>
+        </div>\n    </div>\n</body>
+</html>
+
