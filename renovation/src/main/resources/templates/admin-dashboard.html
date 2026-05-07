@@ -1,0 +1,119 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+            background: white;
+}
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            background-color: red;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: darkred;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+
+    <h2>Users</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.role}"></td>
+            <td>
+                <a class="btn"
+                   th:href="@{'/admin/delete-user/' + ${user.id}}">
+                    Delete
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <h2>Workers</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Profession</th>
+            <th>Rating</th>
+            <th>Action</th>
+        </tr>
+
+        <tr th:each="worker : ${workers}">
+            <td th:text="${worker.id}"></td>
+            <td th:text="${worker.name}"></td>
+            <td th:text="${worker.profession}"></td>
+            <td th:text="${worker.rating}"></td>
+            <td>
+                <a class="btn"
+                   th:href="@{'/admin/delete-worker/' + ${worker.id}}">
+                    Delete
+                </a>
+            </td>
+        </tr>
+
+    </table>
+
+</div>
+
+</body>
+</html>
